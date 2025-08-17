@@ -31,8 +31,8 @@ type Config struct {
 func DefaultConfig() *Config {
 	return &Config{
 		Verbose:              true,
-		TotalItems:          20,
-		DispatchSize:        50,
+		TotalItems:          10,
+		DispatchSize:        5,
 		GeneralChannelSize:  10,
 		DatabaseChannelSize: 20,
 		ForcePanicProb:      0.01, // 1% chance of panic
