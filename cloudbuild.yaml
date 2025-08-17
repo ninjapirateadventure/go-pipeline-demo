@@ -45,8 +45,6 @@ images:
 
 # Build options
 options:
-  # Use default machine type to avoid quota issues
-  machineType: 'E2_HIGHCPU_2'
   # Use cloud logging to avoid bucket requirement
   logging: 'CLOUD_LOGGING_ONLY'
   
