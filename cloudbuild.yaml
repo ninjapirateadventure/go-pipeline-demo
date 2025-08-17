@@ -1,0 +1,57 @@
+steps:
+  # Step 1: Build the Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'build',
+      '--platform', 'linux/amd64',
+      '-t', 'gcr.io/$PROJECT_ID/pipeline-app:$COMMIT_SHA',
+      '-t', 'gcr.io/$PROJECT_ID/pipeline-app:latest',
+      '.'
+    ]
+
+  # Step 2: Push the image to Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/pipeline-app:$COMMIT_SHA']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/pipeline-app:latest']
+
+  # Step 3: Update the Kubernetes deployment with new image
+  - name: 'gcr.io/cloud-builders/kubectl'
+    args:
+    - 'set'
+    - 'image'
+    - 'deployment/pipeline-app'
+    - 'pipeline-app=gcr.io/$PROJECT_ID/pipeline-app:$COMMIT_SHA'
+    env:
+    - 'CLOUDSDK_COMPUTE_ZONE=us-west1-a'
+    - 'CLOUDSDK_CONTAINER_CLUSTER=pipeline-cluster'
+
+  # Step 4: Verify deployment rollout
+  - name: 'gcr.io/cloud-builders/kubectl'
+    args:
+    - 'rollout'
+    - 'status'
+    - 'deployment/pipeline-app'
+    - '--timeout=300s'
+    env:
+    - 'CLOUDSDK_COMPUTE_ZONE=us-west1-a'
+    - 'CLOUDSDK_CONTAINER_CLUSTER=pipeline-cluster'
+
+# Specify which images to store in Container Registry
+images:
+  - 'gcr.io/$PROJECT_ID/pipeline-app:$COMMIT_SHA'
+  - 'gcr.io/$PROJECT_ID/pipeline-app:latest'
+
+# Build options
+options:
+  # Use a machine with more resources for faster builds
+  machineType: 'E2_HIGHCPU_8'
+  
+# Build timeout (10 minutes should be plenty)
+timeout: '600s'
+
+# Substitutions (optional - these are automatically available)
+substitutions:
+  _CLUSTER_NAME: 'pipeline-cluster'
+  _CLUSTER_ZONE: 'us-west1-a'
