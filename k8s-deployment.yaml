@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pipeline-app
+  labels:
+    app: pipeline-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pipeline-app
+  template:
+    metadata:
+      labels:
+        app: pipeline-app
+    spec:
+      containers:
+      - name: pipeline-app
+        image: gcr.io/ordinal-case-469220-g6/pipeline-app:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: GOOGLE_CLOUD_PROJECT
+          value: "ordinal-case-469220-g6"
+        resources:
+          requests:
+            memory: "32Mi"
+            cpu: "25m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pipeline-service
+spec:
+  selector:
+    app: pipeline-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
+  type: LoadBalancer
