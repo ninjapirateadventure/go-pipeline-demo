@@ -31,7 +31,7 @@ type Config struct {
 func DefaultConfig() *Config {
 	return &Config{
 		Verbose:              true,
-		TotalItems:          1,
+		TotalItems:          20,
 		DispatchSize:        50,
 		GeneralChannelSize:  10,
 		DatabaseChannelSize: 20,
